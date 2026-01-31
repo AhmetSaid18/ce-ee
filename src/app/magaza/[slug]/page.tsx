@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { getPublicApiUrl, getBaseHeaders } from '@/lib/api-config';
+import { useCart } from '@/context/CartContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Thumbs, FreeMode } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
@@ -16,6 +18,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 
 export default function ProductDetail({ params }: { params: { slug: string } }) {
+    const router = useRouter();
+    const { addToCart } = useCart();
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
@@ -197,8 +201,26 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
                         </div>
 
                         <div className="flex flex-wrap items-center gap-6 mb-12">
-                            <button className="btn-cyan h-16 px-12 text-xl shadow-xl hover:shadow-cyan-500/20">
+                            <button
+                                onClick={async () => {
+                                    if (!product) return;
+                                    const success = await addToCart(product.id, quantity, undefined, product);
+                                    if (success) router.push('/sepet');
+                                }}
+                                className="btn-cyan h-16 px-8 sm:px-12 text-lg sm:text-xl shadow-xl hover:shadow-cyan-500/20 flex-1 whitespace-nowrap"
+                            >
                                 Hemen Al
+                            </button>
+
+                            <button
+                                onClick={async () => {
+                                    if (!product) return;
+                                    await addToCart(product.id, quantity, undefined, product);
+                                    alert('Ürün sepete eklendi!');
+                                }}
+                                className="h-16 w-16 bg-secondary-blue text-white rounded-2xl flex items-center justify-center shadow-lg hover:bg-primary-blue transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></svg>
                             </button>
 
                             <div className="flex items-center bg-[#F9F9F9] rounded-2xl h-16 px-4">

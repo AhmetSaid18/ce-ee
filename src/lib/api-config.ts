@@ -14,6 +14,17 @@ export const getPublicApiUrl = (endpoint: string) => {
     return `${API_CONFIG.BASE_URL}/api/public${cleanEndpoint}`;
 };
 
+export const getStorefrontApiUrl = (endpoint: string) => {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    return `${API_CONFIG.BASE_URL}/api/storefront${cleanEndpoint}`;
+};
+
+export const getCoreApiUrl = (endpoint: string) => {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    // Direct API calls (Orders, Cart, Payments) without tenant slug in path
+    return `${API_CONFIG.BASE_URL}/api${cleanEndpoint}`;
+};
+
 export const getBaseHeaders = () => {
     return {
         'Content-Type': 'application/json',

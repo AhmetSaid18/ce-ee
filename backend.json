@@ -1,0 +1,420 @@
+{
+    "info": {
+        "_postman_id": "tinisoft-public-api-v1",
+        "name": "Tinisoft Public & Storefront API",
+        "description": "Ziyaretçiler ve Müşteriler için Tinisoft Public API Koleksiyonu.\nEnvironment Tanımları:\n- api_url: Backend URL (örn: http://localhost:8000)\n- tenant_slug: Test edilecek mağazanın slug'ı (örn: ates)\n- customer_token: Login olduktan sonra alınan token",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Storefront (Vitrin)",
+            "item": [
+                {
+                    "name": "Mağaza Ayarlarını Getir (Config)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{api_url}}/api/storefront/config/?domain={{tenant_slug}}.tinisoft.com.tr",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "storefront",
+                                "config",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "domain",
+                                    "value": "{{tenant_slug}}.tinisoft.com.tr",
+                                    "description": "Domain veya subdomain"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Ürünleri Listele (Public)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/api/public/products/?ordering=-created_at&page_size=12",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "public",
+                                "products",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "ordering",
+                                    "value": "-created_at"
+                                },
+                                {
+                                    "key": "page_size",
+                                    "value": "12"
+                                },
+                                {
+                                    "key": "category_slug",
+                                    "value": "yazlik-urunler",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "tshirt",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Ürün Detayı (Slug ile)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/api/public/products/urun/ornek-urun-slug/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "public",
+                                "products",
+                                "urun",
+                                "ornek-urun-slug",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Kategorileri Listele",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/api/public/categories/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "public",
+                                "categories",
+                                ""
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Auth (Müşteri Girişi)",
+            "item": [
+                {
+                    "name": "Kayıt Ol (Register)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"musteri@example.com\",\n    \"password\": \"GucluSifre123!\",\n    \"first_name\": \"Ahmet\",\n    \"last_name\": \"Yılmaz\",\n    \"phone\": \"05551234567\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/api/tenant/{{tenant_slug}}/users/register/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tenant",
+                                "{{tenant_slug}}",
+                                "users",
+                                "register",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Giriş Yap (Login)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"musteri@example.com\",\n    \"password\": \"GucluSifre123!\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/api/tenant/{{tenant_slug}}/users/login/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tenant",
+                                "{{tenant_slug}}",
+                                "users",
+                                "login",
+                                ""
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.success && jsonData.access) {",
+                                    "    pm.environment.set(\"customer_token\", jsonData.access);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "3. Cart (Sepet)",
+            "item": [
+                {
+                    "name": "Sepeti Getir",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{customer_token}}",
+                                "type": "text",
+                                "disabled": true,
+                                "description": "Giriş yapmışsa bu header açılmalı"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/api/cart/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "cart",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sepete Ekle",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"product_id\": \"URUN_UUID_BURAYA\",\n    \"quantity\": 1,\n    \"variant_id\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/api/cart/add/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "cart",
+                                "add",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sepetten Çıkar / Güncelle",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"quantity\": 0\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/api/cart/items/CART_ITEM_UUID_BURAYA/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "cart",
+                                "items",
+                                "CART_ITEM_UUID_BURAYA",
+                                ""
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Checkout & Payment",
+            "item": [
+                {
+                    "name": "Sipariş Oluştur (Checkout)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"cart_id\": \"CART_UUID_BURAYA\",\n    \"customer_email\": \"musteri@example.com\",\n    \"customer_first_name\": \"Ahmet\",\n    \"customer_last_name\": \"Yılmaz\",\n    \"customer_phone\": \"05551234567\",\n    \"shipping_address_id\": null,\n    \"customer_note\": \"Zili çalmayın.\",\n    \"payment_method\": \"credit_card\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/api/orders/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Ödeme Başlat (Init PayTR)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"order_id\": \"ORDER_UUID_BURAYA\",\n    \"provider\": \"paytr\",\n    \"payment_method\": \"credit_card\",\n    \"card_holder_name\": \"Test User\",\n    \"card_number\": \"4111111111111111\",\n    \"card_expiry_month\": \"12\",\n    \"card_expiry_year\": \"2030\",\n    \"card_cvv\": \"123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/api/payments/create/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "payments",
+                                "create",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sipariş Takip (Track)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Tenant-Slug",
+                                "value": "{{tenant_slug}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/api/orders/track/ORD-ATES-1738350000-ABC/",
+                            "host": [
+                                "{{api_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "track",
+                                "ORD-ATES-1738350000-ABC",
+                                ""
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getApiUrl, getAuthHeaders } from '@/lib/api-config';
+import { getApiUrl, getCoreApiUrl, getAuthHeaders } from '@/lib/api-config';
 import Link from 'next/link';
 
 export default function OrdersPage() {
@@ -11,7 +11,7 @@ export default function OrdersPage() {
     useEffect(() => {
         async function fetchOrders() {
             try {
-                const res = await fetch(getApiUrl('/orders/'), { headers: getAuthHeaders() });
+                const res = await fetch(getCoreApiUrl('/orders/'), { headers: getAuthHeaders() });
                 const data = await res.json();
                 setOrders(data.results || []);
             } catch (err) {
@@ -54,8 +54,8 @@ export default function OrdersPage() {
                                     <div>
                                         <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Durum</p>
                                         <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${order.status === 'completed' ? 'bg-green-100 text-green-600' :
-                                                order.status === 'pending' ? 'bg-yellow-100 text-yellow-600' :
-                                                    'bg-blue-100 text-blue-600'
+                                            order.status === 'pending' ? 'bg-yellow-100 text-yellow-600' :
+                                                'bg-blue-100 text-blue-600'
                                             }`}>
                                             {order.status_display}
                                         </span>
