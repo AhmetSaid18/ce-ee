@@ -68,8 +68,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
                 if (res.ok) {
                     const data = await res.json();
+                    console.log('Backend basket response:', data); // DEBUG
+
                     if (data.success && data.basket) {
-                        setCart(data.basket);
+                        // Backend formatını frontend formatına dönüştür
+                        const backendBasket = data.basket;
+                        const mappedCart: Cart = {
+                            id: backendBasket.id,
+                            total_price: parseFloat(backendBasket.subtotal) || parseFloat(backendBasket.total_price) || 0,
+                            currency: backendBasket.currency || 'TRY',
+                            items: (backendBasket.items || []).map((item: any) => ({
+                                id: item.id,
+                                product_id: item.product_id || item.product?.id,
+                                product_name: item.product_name || item.product?.name || 'Ürün',
+                                variant_name: item.variant_name || item.variant?.name || null,
+                                unit_price: parseFloat(item.unit_price) || parseFloat(item.price) || 0,
+                                quantity: item.quantity || 1,
+                                total_price: parseFloat(item.line_total) || parseFloat(item.total_price) || 0,
+                                image_url: item.image_url || item.product?.primary_image || item.product?.images?.[0]?.image_url || '/hero-bear.png'
+                            }))
+                        };
+                        console.log('Mapped cart:', mappedCart); // DEBUG
+                        setCart(mappedCart);
+                    } else if (data.id) {
+                        // Backend doğrudan cart objesi dönebilir
+                        setCart(data);
                     } else {
                         setCart(null);
                     }

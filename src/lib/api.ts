@@ -194,3 +194,57 @@ export async function calculatePaymentFees(
         };
     }
 }
+
+/**
+ * Sipariş Takip Response Interface
+ */
+interface OrderTrackResponse {
+    success: boolean;
+    order_number?: string;
+    status?: string;
+    payment_status?: string;
+    items?: any[];
+    total_price?: number;
+    created_at?: string;
+    error?: string;
+}
+
+/**
+ * Sipariş takip eder
+ * 
+ * @param orderNumber - Sipariş numarası (örn: ORD-ATES-1738350000-ABC)
+ * @returns OrderTrackResponse - Sipariş durumu
+ */
+export async function trackOrder(orderNumber: string): Promise<OrderTrackResponse> {
+    try {
+        const response = await fetch(getCoreApiUrl(`/orders/track/${orderNumber}/`), {
+            method: 'GET',
+            headers: getAuthHeaders(),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return {
+                success: true,
+                order_number: data.order_number,
+                status: data.status,
+                payment_status: data.payment_status,
+                items: data.items,
+                total_price: data.total_price,
+                created_at: data.created_at,
+            };
+        } else {
+            return {
+                success: false,
+                error: data.error || data.message || 'Sipariş bulunamadı.',
+            };
+        }
+    } catch (error) {
+        console.error('Order tracking error:', error);
+        return {
+            success: false,
+            error: 'Bir hata oluştu.',
+        };
+    }
+}

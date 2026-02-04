@@ -294,10 +294,10 @@ export default function CheckoutPage() {
                                         <div key={item.id} className="flex justify-between items-start text-sm">
                                             <div className="flex gap-2">
                                                 <div className="font-bold text-gray-500">{item.quantity}x</div>
-                                                <div className="text-primary-blue">{item.product.name}</div>
+                                                <div className="text-primary-blue">{item.product_name}</div>
                                             </div>
                                             <div className="font-bold text-secondary-blue">
-                                                {parseFloat(item.total_price).toLocaleString('tr-TR')}₺
+                                                {(Number(item.total_price) || 0).toLocaleString('tr-TR')}₺
                                             </div>
                                         </div>
                                     ))}
@@ -306,7 +306,7 @@ export default function CheckoutPage() {
 
                                     <div className="flex justify-between text-lg font-bold">
                                         <span className="text-primary-blue">Toplam</span>
-                                        <span className="text-secondary-blue">{parseFloat(cart.total_price).toLocaleString('tr-TR')}₺</span>
+                                        <span className="text-secondary-blue">{(Number(cart.total_price) || 0).toLocaleString('tr-TR')}₺</span>
                                     </div>
                                 </div>
                             )}
