@@ -77,7 +77,7 @@ export default function CartPage() {
 
                                         <div className="flex flex-col items-end justify-between">
                                             <h4 className="text-xl font-bold text-secondary-blue mb-4">
-                                                {item.total_price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {cart?.currency || 'TRY'}
+                                                {(Number(item.total_price) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {cart?.currency || 'TRY'}
                                             </h4>
 
                                             <div className="flex items-center bg-[#F5F5F5] rounded-xl h-10 px-2">
@@ -111,7 +111,7 @@ export default function CartPage() {
                                 <div className="space-y-4 mb-8">
                                     <div className="flex justify-between text-lg">
                                         <span className="text-text-muted">Ara Toplam</span>
-                                        <span className="font-bold text-primary-blue">{cart!.total_price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {cart?.currency || 'TRY'}</span>
+                                        <span className="font-bold text-primary-blue">{(Number(cart?.total_price) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {cart?.currency || 'TRY'}</span>
                                     </div>
                                     <div className="flex justify-between text-lg">
                                         <span className="text-text-muted">Kargo</span>
@@ -119,7 +119,7 @@ export default function CartPage() {
                                     </div>
                                     <div className="pt-4 border-t border-gray-100 flex justify-between text-xl">
                                         <span className="font-bold text-primary-blue">Toplam</span>
-                                        <span className="font-bold text-secondary-blue text-2xl">{cart!.total_price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {cart?.currency || 'TRY'}</span>
+                                        <span className="font-bold text-secondary-blue text-2xl">{(Number(cart?.total_price) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {cart?.currency || 'TRY'}</span>
                                     </div>
                                 </div>
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { getApiUrl, getCoreApiUrl, getAuthHeaders, getBaseHeaders } from '@/lib/api-config';
+import { createPayment } from '@/lib/api';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
@@ -76,7 +77,7 @@ export default function CheckoutPage() {
         }
     };
 
-    // 2. Ödeme Başlatma
+    // 2. Ödeme Başlatma (3D Secure)
     const handlePayment = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -84,37 +85,41 @@ export default function CheckoutPage() {
         try {
             if (!orderId) return;
 
-            const payload = {
+            // 3D Secure ödeme başlat
+            const result = await createPayment({
                 order_id: orderId,
-                provider: 'paytr',
-                payment_method: 'credit_card',
-                card_holder_name: card.holder_name,
-                card_number: card.number.replace(/\s/g, ''),
-                card_expiry_month: card.expiry_month,
-                card_expiry_year: card.expiry_year,
-                card_cvv: card.cvv
-            };
-
-            const headers: any = getAuthHeaders();
-
-            const res = await fetch(getCoreApiUrl('/payments/create/'), {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(payload)
+                provider: 'kuwait',
+                customer_info: {
+                    email: customer.email,
+                    name: `${customer.first_name} ${customer.last_name}`,
+                    phone: customer.phone,
+                    card_number: card.number,
+                    card_expiry_month: card.expiry_month,
+                    card_expiry_year: card.expiry_year,
+                    card_cvv: card.cvv,
+                    billing: {
+                        line1: customer.address,
+                        city: 'Istanbul',
+                        state: 'Istanbul',
+                        postcode: '34000',
+                        country_code: '792'
+                    }
+                }
             });
 
-            const data = await res.json();
-
-            if (res.ok) {
-                // Başarılı!
-                alert('Ödeme Başarılı! Siparişiniz alındı.');
-                router.push('/hesabim/siparislerim'); // Veya başarı sayfasına
+            if (result.success && result.payment_html) {
+                // 3D Secure sayfasına yönlendir
+                document.open();
+                document.write(result.payment_html);
+                document.close();
             } else {
-                alert(data.message || 'Ödeme işleminde hata oluştu.');
+                // Hata sayfasına yönlendir
+                const errorMsg = encodeURIComponent(result.error || 'Ödeme başarısız');
+                router.push(`/odeme/basarisiz?msg=${errorMsg}`);
             }
         } catch (error) {
             console.error(error);
-            alert('Ödeme hatası.');
+            router.push('/odeme/basarisiz?msg=Beklenmeyen%20bir%20hata%20oluştu');
         } finally {
             setLoading(false);
         }

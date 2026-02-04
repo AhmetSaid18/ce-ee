@@ -2,8 +2,33 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 const Footer = () => {
+    const [isOnDarkSection, setIsOnDarkSection] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+
+            // Calculate scroll percentage
+            const scrollPercent = (scrollY + windowHeight) / documentHeight;
+
+            // Testimonials section is roughly 40-65% of page, Footer is after 90%
+            // Dark sections: Testimonials (~40-65%) and Footer (>90%)
+            const isInDarkArea = (scrollPercent > 0.40 && scrollPercent < 0.65) || scrollPercent > 0.90;
+
+            setIsOnDarkSection(isInDarkArea);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Initial check
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
         <footer className="bg-[#162145] text-white py-16 px-4">
             <div className="max-w-7xl mx-auto flex flex-col items-center">
@@ -67,15 +92,23 @@ const Footer = () => {
                 </div>
             </div>
 
-            {/* Floating Widget Placeholder */}
+            {/* Floating Chat Widget - Color changes based on scroll */}
             <div className="fixed bottom-6 right-6 z-50 group cursor-pointer">
                 <div className="relative">
-                    <div className="absolute -top-12 -left-16 bg-white text-primary-dark px-4 py-2 rounded-2xl text-sm font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100">
-                        We Are Here!
+                    <div className="absolute -top-12 -left-20 bg-white text-primary-dark px-4 py-2 rounded-2xl text-sm font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 whitespace-nowrap z-20">
+                        Bize Ulaşın!
                     </div>
-                    <div className="w-16 h-16 bg-secondary-blue rounded-full flex items-center justify-center shadow-2xl animate-bounce hover:animate-none">
-                        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                    {/* Pulse ring effect - behind the button */}
+                    <div className={`absolute inset-0 w-16 h-16 rounded-full animate-ping opacity-40 z-0 transition-colors duration-500 ${isOnDarkSection ? 'bg-primary-orange' : 'bg-[#1E2B58]'
+                        }`}></div>
+                    {/* Main button - color changes based on scroll position */}
+                    <div className={`relative w-16 h-16 rounded-full flex items-center justify-center shadow-2xl border-4 animate-bounce hover:animate-none transition-all duration-500 hover:scale-110 z-10 ${isOnDarkSection
+                        ? 'bg-primary-orange border-white hover:bg-white hover:border-primary-orange'
+                        : 'bg-[#1E2B58] border-primary-orange hover:border-secondary-pink'
+                        }`}>
+                        <svg className={`w-6 h-6 transition-colors duration-500 ${isOnDarkSection ? 'text-white group-hover:text-primary-orange' : 'text-white'
+                            }`} viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
                         </svg>
                     </div>
                 </div>
