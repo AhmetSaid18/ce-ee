@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getApiUrl, getAuthHeaders } from '@/lib/api-config';
+import { getApiUrl, getCoreApiUrl, getAuthHeaders } from '@/lib/api-config';
 
 interface Address {
     id: string;
@@ -37,7 +37,7 @@ export default function AddressesPage() {
 
     const fetchAddresses = async () => {
         try {
-            const res = await fetch(getApiUrl('/shipping/addresses/'), { headers: getAuthHeaders() });
+            const res = await fetch(getCoreApiUrl('/shipping/addresses/'), { headers: getAuthHeaders() });
             const data = await res.json();
             setAddresses(Array.isArray(data) ? data : (data.results || []));
         } catch (err) {
@@ -54,8 +54,8 @@ export default function AddressesPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const url = editingAddress
-            ? getApiUrl(`/shipping/addresses/${editingAddress.id}/`)
-            : getApiUrl('/shipping/addresses/');
+            ? getCoreApiUrl(`/shipping/addresses/${editingAddress.id}/`)
+            : getCoreApiUrl('/shipping/addresses/');
 
         const method = editingAddress ? 'PATCH' : 'POST';
 
@@ -81,7 +81,7 @@ export default function AddressesPage() {
         if (!confirm('Bu adresi silmek istediğinize emin misiniz?')) return;
 
         try {
-            const res = await fetch(getApiUrl(`/shipping/addresses/${id}/`), {
+            const res = await fetch(getCoreApiUrl(`/shipping/addresses/${id}/`), {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });

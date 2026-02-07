@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { getStorefrontApiUrl, getBaseHeaders } from '@/lib/api-config';
+import { getPublicApiUrl, getBaseHeaders } from '@/lib/api-config';
 import { useCart } from '@/context/CartContext';
 
 export default function StorePage() {
@@ -16,8 +16,8 @@ export default function StorePage() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // Yeni Storefront API
-                const res = await fetch(getStorefrontApiUrl('/products'), {
+                // Public API kullanıyoruz
+                const res = await fetch(getPublicApiUrl('/products'), {
                     headers: getBaseHeaders()
                 });
                 const data = await res.json();

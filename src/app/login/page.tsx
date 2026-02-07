@@ -35,12 +35,23 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok) {
-                // Token yönetimi
-                localStorage.setItem('auth_token', data.access);
-                if (data.refresh) localStorage.setItem('refresh_token', data.refresh);
+                // Token'ı kaydet ve yönlendir - backend 'token' veya 'access' dönebilir
+                const token = data.token || data.access;
+                if (token) {
+                    localStorage.setItem('auth_token', token);
+                    if (data.user) {
+                        localStorage.setItem('user_info', JSON.stringify(data.user));
+                    }
 
-                router.push('/hesabim');
-                router.refresh();
+                    // Diğer componentleri (Navbar vb.) haberdar et
+                    window.dispatchEvent(new Event('storage'));
+                    window.dispatchEvent(new Event('login'));
+
+                    router.push('/hesabim');
+                    router.refresh();
+                } else {
+                    setError('Sunucudan geçersiz yanıt alındı.');
+                }
             } else {
                 setError(data.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
             }

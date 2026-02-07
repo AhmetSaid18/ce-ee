@@ -50,8 +50,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     // Auth durumunu kontrol et
     useEffect(() => {
-        const token = localStorage.getItem('auth_token');
-        setIsLoggedIn(!!token);
+        const checkLogin = () => {
+            const token = localStorage.getItem('auth_token');
+            setIsLoggedIn(!!token);
+        };
+
+        checkLogin();
+
+        window.addEventListener('storage', checkLogin);
+        window.addEventListener('login', checkLogin);
+
+        return () => {
+            window.removeEventListener('storage', checkLogin);
+            window.removeEventListener('login', checkLogin);
+        };
     }, []);
 
     // 1. Sepeti Getir (Hybrid)

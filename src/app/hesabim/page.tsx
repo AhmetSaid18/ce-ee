@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getApiUrl, getAuthHeaders } from '@/lib/api-config';
+import { getApiUrl, getCoreApiUrl, getAuthHeaders } from '@/lib/api-config';
 
 export default function DashboardOverview() {
     const [stats, setStats] = useState({
@@ -16,8 +16,8 @@ export default function DashboardOverview() {
         async function fetchData() {
             try {
                 const [ordersRes, addressesRes] = await Promise.all([
-                    fetch(getApiUrl('/orders/'), { headers: getAuthHeaders() }),
-                    fetch(getApiUrl('/shipping/addresses/'), { headers: getAuthHeaders() })
+                    fetch(getCoreApiUrl('/orders/'), { headers: getAuthHeaders() }),
+                    fetch(getCoreApiUrl('/shipping/addresses/'), { headers: getAuthHeaders() })
                 ]);
 
                 const ordersData = await ordersRes.json();
@@ -112,8 +112,8 @@ export default function DashboardOverview() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${order.status === 'completed' ? 'bg-green-100 text-green-600' :
-                                                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-600' :
-                                                        'bg-blue-100 text-blue-600'
+                                                order.status === 'pending' ? 'bg-yellow-100 text-yellow-600' :
+                                                    'bg-blue-100 text-blue-600'
                                                 }`}>
                                                 {order.status_display}
                                             </span>

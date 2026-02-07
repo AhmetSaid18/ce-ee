@@ -31,8 +31,20 @@ export const getBaseHeaders = () => {
         'X-Tenant-Slug': API_CONFIG.TENANT_SLUG,
     };
 };
+
 export const getAuthHeaders = () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    let token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+
+    // Malformed token check (e.g., "undefined", "null", or missing segments)
+    if (token === 'undefined' || token === 'null' || (token && token.split('.').length < 3)) {
+        if (token && token !== 'undefined' && token !== 'null') console.warn('Malformed token detected and removed');
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('auth_token');
+            window.dispatchEvent(new Event('storage'));
+        }
+        token = null;
+    }
+
     return {
         ...getBaseHeaders(),
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),

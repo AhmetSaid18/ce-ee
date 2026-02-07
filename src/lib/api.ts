@@ -41,7 +41,9 @@ interface PaymentPayload {
  */
 interface PaymentResponse {
     success: boolean;
-    payment_html?: string;  // 3D Secure için banka sayfası HTML'i
+    payment_html?: string;  // 3D Secure için banka sayfası HTML'i (Eski yöntem - iframe)
+    payment_url?: string;   // Direct API için post edilecek URL
+    data?: any;             // Direct API için form dataları
     message?: string;
     error?: string;
     offline_message?: string;  // Banka havalesi için
@@ -49,14 +51,19 @@ interface PaymentResponse {
 
 /**
  * 3D Secure ödeme başlatır
- * Backend'e ödeme isteği gönderir, payment_html döner
+ * Backend'e ödeme isteği gönderir.
+ * İki senaryo var:
+ * 1. Iframe/HTML : payment_html döner
+ * 2. Direct Post : payment_url ve data döner
  * 
  * @param payload - Ödeme bilgileri (sipariş ID, customer_info)
- * @returns PaymentResponse - payment_html veya hata
+ * @returns PaymentResponse
  */
 export async function createPayment(payload: PaymentPayload): Promise<PaymentResponse> {
     try {
-        // customer_info içindeki kart bilgilerini temizle
+        // customer_info içindeki kart bilgilerini temizle/düzenle
+        // Not: Yeni Direct API akışında kart bilgisi backend'e gitmeyebilir, 
+        // ancak mevcut yapıyı bozmamak için olduğu gibi bırakıyoruz veya boş geçiyoruz.
         const cleanedCustomerInfo = {
             ...payload.customer_info,
             card_number: payload.customer_info.card_number.replace(/\s/g, ''),
@@ -68,8 +75,15 @@ export async function createPayment(payload: PaymentPayload): Promise<PaymentRes
             headers: getAuthHeaders(),
             body: JSON.stringify({
                 order_id: payload.order_id,
-                provider: payload.provider || 'kuwait',
-                customer_info: cleanedCustomerInfo,
+                provider: payload.provider || 'paytr',
+                // Kart bilgilerini backend'e gönderme! Sadece hash için gerekli müşteri bilgilerini gönder.
+                customer_info: {
+                    email: payload.customer_info.email,
+                    name: payload.customer_info.name,
+                    phone: payload.customer_info.phone,
+                    billing: payload.customer_info.billing,
+                    ip_address: payload.customer_info.ip_address
+                },
             }),
         });
 
@@ -79,6 +93,8 @@ export async function createPayment(payload: PaymentPayload): Promise<PaymentRes
             return {
                 success: true,
                 payment_html: data.payment_html,
+                payment_url: data.payment_url,
+                data: data.data,
                 message: data.message,
                 offline_message: data.offline_message,
             };

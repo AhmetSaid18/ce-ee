@@ -14,7 +14,19 @@ const Navbar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        setIsLoggedIn(!!localStorage.getItem('auth_token'));
+        const checkLogin = () => {
+            setIsLoggedIn(!!localStorage.getItem('auth_token'));
+        };
+
+        checkLogin();
+
+        window.addEventListener('storage', checkLogin);
+        window.addEventListener('login', checkLogin);
+
+        return () => {
+            window.removeEventListener('storage', checkLogin);
+            window.removeEventListener('login', checkLogin);
+        };
     }, []);
 
     const handleStoreClick = async (e: React.MouseEvent) => {

@@ -69,13 +69,23 @@ export default function RegisterPage() {
             const data = await response.json();
 
             if (response.ok) {
-                // Token'ı kaydet ve yönlendir
-                localStorage.setItem('auth_token', data.token);
-                if (data.user) {
-                    localStorage.setItem('user_info', JSON.stringify(data.user));
+                // Token'ı kaydet ve yönlendir - backend 'token' veya 'access' dönebilir
+                const token = data.token || data.access;
+                if (token) {
+                    localStorage.setItem('auth_token', token);
+                    if (data.user) {
+                        localStorage.setItem('user_info', JSON.stringify(data.user));
+                    }
+
+                    // Diğer componentleri (Navbar vb.) haberdar et
+                    window.dispatchEvent(new Event('storage'));
+                    window.dispatchEvent(new Event('login'));
+
+                    router.push('/hesabim');
+                    router.refresh();
+                } else {
+                    setError('Sunucudan geçersiz yanıt alındı.');
                 }
-                router.push('/hesabim');
-                router.refresh();
             } else {
                 setError(data.message || 'Doğrulama kodu hatalı veya süresi dolmuş.');
             }
